@@ -1,17 +1,27 @@
 <!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Verification Flow</title>
   <style>
-    * { box-sizing: border-box; }
+    html {
+      transform: scale(1);
+      transform-origin: top left;
+      zoom: reset;
+    }
     body {
       font-family: Arial, sans-serif;
       background: #f0f2f5;
+      margin: 0;
+      height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      margin: 0;
+    }
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
     }
     .card {
       background: white;
@@ -19,7 +29,6 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       text-align: center;
-      width: 350px;
     }
     h2 {
       margin-bottom: 0.5rem;
@@ -50,6 +59,7 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
+      width: 100%;
     }
     .btn:disabled {
       background: #a5d6a7;
@@ -69,41 +79,56 @@
       animation: spin 1s linear infinite;
       margin: 2rem auto;
     }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
     #video-card video {
       width: 100%;
       height: auto;
       border-radius: 12px;
       pointer-events: none;
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
   </style>
 </head>
-<body>  <!-- Step 1: Pre-verification -->  <div class="card" id="start-card">
-    <h2>Start Verification</h2>
-    <p class="subtitle">Before we start, I would like to verify your identity through a one-time passcode (OTP). Please click below to begin the process.</p>
-    <button class="btn" onclick="startVerification()">Start Verification</button>
-  </div>  <!-- Step 2: OTP verification -->  <div class="card" id="verify-card" style="display: none;">
-    <h2>Account Verification</h2>
-    <p class="subtitle">We have just sent the code <strong id="display-otp">000000</strong> to your phone number: <span id="phone-number">+63********00</span></p>
-    <div class="otp-inputs">
-      <input type="text" maxlength="1">
-      <input type="text" maxlength="1">
-      <input type="text" maxlength="1">
-      <input type="text" maxlength="1">
-      <input type="text" maxlength="1">
-      <input type="text" maxlength="1">
-    </div>
-    <button class="btn" id="verify-btn" disabled>Verify</button>
-  </div>  <!-- Step 3: Success -->  <div class="card" id="success-card" style="display: none;">
-    <h2>Verification Successful!</h2>
-    <p class="success">Your account has been verified. 🎉</p>
-  </div>  <!-- Step 4: Loading screen -->  <div class="card" id="loading-card" style="display: none;">
-    <div class="loading-spinner"></div>
-  </div>  <!-- Step 5: Video Prank -->  <div class="card" id="video-card" style="display: none;">
-    <video id="prank-video" src="itsaprank.mp4" autoplay muted controlslist="nodownload nofullscreen noremoteplayback" oncontextmenu="return false;"></video>
+<body>
+  <div class="container">
+    <!-- Step 1: Pre-verification -->
+    <div class="card" id="start-card">
+      <h2>Start Verification</h2>
+      <p class="subtitle">Before we start, I would like to verify your identity through a one-time passcode (OTP). Please click below to begin the process.</p>
+      <button class="btn" onclick="startVerification()">Start Verification</button>
+    </div><!-- Step 2: OTP verification -->
+<div class="card" id="verify-card" style="display: none;">
+  <h2>Account Verification</h2>
+  <p class="subtitle">We have just sent the code <strong id="display-otp">000000</strong> to your phone number: <span id="phone-number">+63********00</span></p>
+  <div class="otp-inputs">
+    <input type="text" maxlength="1">
+    <input type="text" maxlength="1">
+    <input type="text" maxlength="1">
+    <input type="text" maxlength="1">
+    <input type="text" maxlength="1">
+    <input type="text" maxlength="1">
+  </div>
+  <button class="btn" id="verify-btn" disabled>Verify</button>
+</div>
+
+<!-- Step 3: Success -->
+<div class="card" id="success-card" style="display: none;">
+  <h2>Verification Successful!</h2>
+  <p class="success">Your account has been verified. 🎉</p>
+</div>
+
+<!-- Step 4: Loading screen -->
+<div class="card" id="loading-card" style="display: none;">
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- Step 5: Video Prank -->
+<div class="card" id="video-card" style="display: none;">
+  <video id="prank-video" src="itsaprank.mp4" autoplay muted playsinline></video>
+</div>
+
   </div>  <script>
     let otp = '';
 
@@ -148,11 +173,14 @@
 
           setTimeout(() => {
             document.getElementById('loading-card').style.display = 'none';
-            document.getElementById('video-card').style.display = 'block';
-            document.getElementById('prank-video').play();
-          }, 20000); // 20 seconds
-
-        }, 3000); // 3 seconds
+            const videoCard = document.getElementById('video-card');
+            videoCard.style.display = 'block';
+            const video = document.getElementById('prank-video');
+            video.muted = false;
+            video.volume = 1;
+            video.play();
+          }, 20000);
+        }, 3000);
 
       } else {
         alert('Incorrect code. Try again!');
