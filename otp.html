@@ -1,0 +1,165 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Verification Flow</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 350px;
+    }
+    h2 {
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+    .otp-inputs {
+      display: flex;
+      justify-content: space-between;
+      gap: 5px;
+      margin-bottom: 1.5rem;
+    }
+    .otp-inputs input {
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 1.5rem;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .btn:disabled {
+      background: #a5d6a7;
+      cursor: not-allowed;
+    }
+    .success {
+      font-size: 1.2rem;
+      color: #4CAF50;
+      margin-top: 1rem;
+    }
+    .loading-spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #4CAF50;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 2rem auto;
+    }
+    #video-card video {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      pointer-events: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>  <!-- Step 1: Pre-verification -->  <div class="card" id="start-card">
+    <h2>Start Verification</h2>
+    <p class="subtitle">Before we start, I would like to verify your identity through a one-time passcode (OTP). Please click below to begin the process.</p>
+    <button class="btn" onclick="startVerification()">Start Verification</button>
+  </div>  <!-- Step 2: OTP verification -->  <div class="card" id="verify-card" style="display: none;">
+    <h2>Account Verification</h2>
+    <p class="subtitle">We have just sent the code <strong id="display-otp">000000</strong> to your phone number: <span id="phone-number">+63********00</span></p>
+    <div class="otp-inputs">
+      <input type="text" maxlength="1">
+      <input type="text" maxlength="1">
+      <input type="text" maxlength="1">
+      <input type="text" maxlength="1">
+      <input type="text" maxlength="1">
+      <input type="text" maxlength="1">
+    </div>
+    <button class="btn" id="verify-btn" disabled>Verify</button>
+  </div>  <!-- Step 3: Success -->  <div class="card" id="success-card" style="display: none;">
+    <h2>Verification Successful!</h2>
+    <p class="success">Your account has been verified. 🎉</p>
+  </div>  <!-- Step 4: Loading screen -->  <div class="card" id="loading-card" style="display: none;">
+    <div class="loading-spinner"></div>
+  </div>  <!-- Step 5: Video Prank -->  <div class="card" id="video-card" style="display: none;">
+    <video id="prank-video" src="itsaprank.mp4" autoplay muted controlslist="nodownload nofullscreen noremoteplayback" oncontextmenu="return false;"></video>
+  </div>  <script>
+    let otp = '';
+
+    function startVerification() {
+      document.getElementById('start-card').style.display = 'none';
+      document.getElementById('verify-card').style.display = 'block';
+
+      otp = String(Math.floor(100000 + Math.random() * 900000));
+      const lastTwo = Math.floor(10 + Math.random() * 90); // Two random digits
+      document.getElementById('display-otp').textContent = otp;
+      document.getElementById('phone-number').textContent = `+63********${lastTwo}`;
+    }
+
+    const inputs = document.querySelectorAll('.otp-inputs input');
+    const verifyBtn = document.getElementById('verify-btn');
+
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', () => {
+        input.value = input.value.replace(/[^0-9]/g, '');
+        if (input.value && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+        verifyBtn.disabled = ![...inputs].every(i => i.value);
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !input.value && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+    });
+
+    verifyBtn.addEventListener('click', () => {
+      const entered = [...inputs].map(input => input.value).join('');
+      if (entered === otp) {
+        document.getElementById('verify-card').style.display = 'none';
+        document.getElementById('success-card').style.display = 'block';
+
+        setTimeout(() => {
+          document.getElementById('success-card').style.display = 'none';
+          document.getElementById('loading-card').style.display = 'block';
+
+          setTimeout(() => {
+            document.getElementById('loading-card').style.display = 'none';
+            document.getElementById('video-card').style.display = 'block';
+            document.getElementById('prank-video').play();
+          }, 20000); // 20 seconds
+
+        }, 3000); // 3 seconds
+
+      } else {
+        alert('Incorrect code. Try again!');
+        inputs.forEach(input => input.value = '');
+        inputs[0].focus();
+        verifyBtn.disabled = true;
+      }
+    });
+  </script></body>
+</html>
